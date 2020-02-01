@@ -10,6 +10,7 @@ const userSchema = new Schema({
         foodLog: [
             {
                 name: String,
+                servings: Number,
                 emissions: Number,
                 waterUsed: Number
             }
