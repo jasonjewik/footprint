@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const utils = require('../services/utils')
 
 const UserController = (UserModel) =>
 {
@@ -124,7 +125,7 @@ const UserController = (UserModel) =>
                 let newLog = {
                     foodName: foodName,
                     servings: servings,
-                    emissions: 1
+                    emissions: servings * utils[utils.foodMultiplier] * utils[foodName]
                 };
 
                 footstep.foodLog.push(newLog);
@@ -132,7 +133,7 @@ const UserController = (UserModel) =>
 
                 return res.status(200).json(priorData);
             }
-        }
+		}
 
         return res.status(404).json({
             error: 'No footstep for date found'
@@ -210,9 +211,6 @@ const UserController = (UserModel) =>
             });
 
         // Update lifetime stats
-        priorData.lifetimeStats.emissions = 0;
-        priorData.lifetimeStats.distanceWalked = 0;
-        priorData.lifetimeStats.distanceByCar = 0;
         for(footstep of priorData.footsteps) {
             priorData.lifetimeStats.emissions += footstep.stats.emissions;
             priorData.lifetimeStats.distanceWalked += footstep.stats.distanceWalked;

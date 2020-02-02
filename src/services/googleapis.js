@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const vision = require("@google-cloud/vision");
 const fs = require('fs');
@@ -6,7 +7,13 @@ const GoogleVisionAPI = () => {
 	const router = express.Router();
 
 	router.post('/', async(req, res) => {
-		const client = new vision.ImageAnnotatorClient();
+		const client = new vision.ImageAnnotatorClient({
+			credentials: {
+				client_email: process.env.CLIENT_EMAIL,
+				private_key: process.env.PRIVATE_KEY
+			},
+			projectId: process.env.PROJECT_ID
+		});
 		const img = req.body.img;
 
 		if (img === undefined)
