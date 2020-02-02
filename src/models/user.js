@@ -18,7 +18,6 @@ const userSchema = new Schema({
             {
                 mode: String,
                 distance: Number,
-                duration: Number,
                 emissions: Number
             }
         ],
