@@ -305,6 +305,7 @@ const UserController = UserModel => {
         }
       }
     }
+    return res.status(200).json(detectedFoods)
   })
 
   return router
