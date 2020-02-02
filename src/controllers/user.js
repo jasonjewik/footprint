@@ -285,7 +285,7 @@ const UserController = UserModel => {
     console.log(detectedFoods)
 
     if (count > 0) {
-      const tier = totalTier / count
+      const tier = Math.min(Math.max(1, Math.round(totalTier / count)), 5)
       const emissions = FOOD_TIERS[tier] * detectedFoods.length * 2
 
       for (footstep of priorData.footsteps) {
