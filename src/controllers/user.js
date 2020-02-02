@@ -102,10 +102,9 @@ const UserController = (UserModel) =>
         const date = req.body.date;
         const foodName = req.body.foodName;
         const servings = req.body.servings;
-        const emissions = req.body.emissions;
 
-        if (fb_id === undefined || date === undefined || foodName === undefined || 
-            servings === undefined || emissions === undefined)
+        if (fb_id === undefined || date === undefined || 
+            foodName === undefined || servings === undefined)
             return res.status(400).json({
                 error: 'Malformed request'
             });
@@ -122,15 +121,11 @@ const UserController = (UserModel) =>
             if(footstep.date === date) {
                 let newLog = {
                     foodName: foodName,
-                    servings: servings,
-                    emissions: emissions
+                    servings: servings
                 };
 
                 footstep.foodLog.push(newLog);
                 priorData.save();
-
-                // Update footstep stats for the day
-                footstep.stats.emissions += emissions;
 
                 return res.status(200).json(priorData);
             }
@@ -147,10 +142,9 @@ const UserController = (UserModel) =>
         const date = req.body.date;
         const mode = req.body.mode;
         const distance = req.body.distance;
-        const emissions = req.body.emissions;
 
-        if (fb_id === undefined || date === undefined || mode === undefined || 
-            distance === undefined || emissions === undefined)
+        if (fb_id === undefined || date === undefined || 
+            mode === undefined || distance === undefined)
             return res.status(400).json({
                 error: 'Malformed request'
             });
@@ -167,14 +161,12 @@ const UserController = (UserModel) =>
             if(footstep.date === date) {
                 let newLog = {
                     mode: mode,
-                    distance: distance,
-                    emissions: emissions
+                    distance: distance
                 };
                 footstep.transportationLog.push(newLog);
 
                 // Update footstep stats for the day
                 footstepStats = footstep.stats;
-                footstepStats.emissions += emissions;
                 if(mode === "Walking")
                     footstepStats.distanceWalked += distance
                 else if(mode === "Car")
