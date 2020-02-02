@@ -267,6 +267,8 @@ const UserController = UserModel => {
 
     let outputs = []
     labels.forEach(label => outputs.push([label.description, label.score]))
+    console.log('Outputs:')
+    console.log(outputs)
     let totalTier = 0
     let count = 0
     const detectedFoods = []
@@ -278,6 +280,10 @@ const UserController = UserModel => {
         count += 1
       }
     })
+
+    console.log('Detected foods:')
+    console.log(detectedFoods)
+
     if (count > 0) {
       const tier = totalTier / count
       const emissions = FOOD_TIERS[tier] * detectedFoods.length * 2
