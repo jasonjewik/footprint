@@ -244,8 +244,8 @@ const UserController = UserModel => {
 
   router.post('/vision', async (req, res) => {
     const fb_id = req.body.fb_id
-    const encoded = req.encoded
-    const date = req.date
+    const encoded = req.body.encoded
+    const date = req.body.date
     if (fb_id === undefined || encoded === undefined || date === undefined)
       return res.status(400).json({
         error: 'Malformed request'
