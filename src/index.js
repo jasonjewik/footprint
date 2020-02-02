@@ -36,4 +36,4 @@ function main(port)
 	});
 }
 
-main(process.env.PORT);
+main(process.env.PORT || 3000);
