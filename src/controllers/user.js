@@ -241,65 +241,67 @@ const UserController = UserModel => {
     return res.status(200).json(priorData.lifetimeStats)
   })
 
-  return router
-}
+  router.post('/vision', async (req, res) => {
+    const fb_id = req.body.fb_id
+    const encoded = req.encoded
+    const date = req.date
+    if (fb_id === undefined || encoded === undefined || date === undefined)
+      return res.status(400).json({
+        error: 'Malformed request'
+      })
 
-router.post('/vision', async (req, res) => {
-  const fb_id = req.body.fb_id
-  const encoded = req.encoded
-  const date = req.date
-  if (fb_id === undefined || encoded === undefined || date === undefined)
-    return res.status(400).json({
-      error: 'Malformed request'
+    const priorData = await UserModel.findOne({ fb_id: fb_id })
+    if (priorData == null)
+      return res.status(404).json({
+        error: 'Invalid User ID'
+      })
+
+    // const imgFile = fs.readFileSync(img);
+    // const encoded = Buffer.from(imgFile).toString('base64');
+    // console.log(encoded);
+    const [result] = await client.labelDetection({
+      image: { content: encoded }
     })
+    const labels = result.labelAnnotations
 
-  const priorData = await UserModel.findOne({ fb_id: fb_id })
-  if (priorData == null)
-    return res.status(404).json({
-      error: 'Invalid User ID'
+    let outputs = []
+    labels.forEach(label => outputs.push([label.description, label.score]))
+    let totalTier = 0
+    let count = 0
+    const detectedFoods = []
+
+    outputs.forEach(([desc, score]) => {
+      if (score > 0.5 && EmissionChart[desc.toLowerCase()]) {
+        totalTier += EmissionChart[desc.toLowerCase()]
+        detectedFoods.push(desc)
+        count += 1
+      }
     })
+    if (count > 0) {
+      const tier = totalTier / count
+      const emissions = FOOD_TIERS[tier] * detectedFoods.length * 2
 
-  // const imgFile = fs.readFileSync(img);
-  // const encoded = Buffer.from(imgFile).toString('base64');
-  // console.log(encoded);
-  const [result] = await client.labelDetection({ image: { content: encoded } })
-  const labels = result.labelAnnotations
+      for (footstep of priorData.footsteps) {
+        if (footstep.date === date) {
+          detectedFoods.forEach(foodName => {
+            let newLog = {
+              foodName,
+              servings: 2,
+              emissions: emissions / detectedFoods.length
+            }
+            footstep.foodLog.push(newLog)
+          })
 
-  let outputs = []
-  labels.forEach(label => outputs.push([label.description, label.score]))
-  let totalTier = 0
-  let count = 0
-  const detectedFoods = []
+          priorData.save()
 
-  outputs.forEach(([desc, score]) => {
-    if (score > 0.5 && EmissionChart[desc.toLowerCase()]) {
-      totalTier += EmissionChart[desc.toLowerCase()]
-      detectedFoods.push(desc)
-      count += 1
-    }
-  })
-  if (count > 0) {
-    const tier = totalTier / count
-    const emissions = FOOD_TIERS[tier] * detectedFoods.length * 2
-
-    for (footstep of priorData.footsteps) {
-      if (footstep.date === date) {
-        detectedFoods.forEach(foodName => {
-          let newLog = {
-            foodName,
-            servings: 2,
-            emissions: emissions / detectedFoods.length
-          }
-          footstep.foodLog.push(newLog)
-        })
-
-        priorData.save()
-
-        return res.status(200).json(detectedFoods)
+          return res.status(200).json(detectedFoods)
+        }
       }
     }
-  }
-})
+  })
+
+  return router
+}
 
 module.exports = {
   UserController
