@@ -4,12 +4,12 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     fb_id: Number,
     name: String,
-    dateJoined: Date,
+    dateJoined: String,
     footsteps: [{
-        date: Date,
+        date: String,
         foodLog: [
             {
-                name: String,
+                foodName: String,
                 servings: Number,
                 emissions: Number,
                 waterUsed: Number
