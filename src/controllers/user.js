@@ -147,11 +147,10 @@ const UserController = (UserModel) =>
         const date = req.body.date;
         const mode = req.body.mode;
         const distance = req.body.distance;
-        const duration = req.body.duration;
         const emissions = req.body.emissions;
 
         if (fb_id === undefined || date === undefined || mode === undefined || 
-            distance === undefined || duration === undefined || emissions === undefined)
+            distance === undefined || emissions === undefined)
             return res.status(400).json({
                 error: 'Malformed request'
             });
@@ -169,7 +168,6 @@ const UserController = (UserModel) =>
                 let newLog = {
                     mode: mode,
                     distance: distance,
-                    duration: duration,
                     emissions: emissions
                 };
                 footstep.transportationLog.push(newLog);
