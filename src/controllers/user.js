@@ -70,7 +70,9 @@ const UserController = (UserModel) =>
             });
 
         // Check if footstep for date already exists
-        const date = new Date().toDateString();
+        let date = new Date();
+        date.setHours(date.getHours() - 3);
+        date = date.toDateString();
         const priorFootstep = await UserModel.findOne({"fb_id": fb_id, "footsteps.date": date});
         if(priorFootstep != null)
             return res.status(200).json({
