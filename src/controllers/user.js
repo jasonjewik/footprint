@@ -267,8 +267,8 @@ const UserController = UserModel => {
 
     let outputs = []
     labels.forEach(label => outputs.push([label.description, label.score]))
-    console.log('Outputs:')
-    console.log(outputs)
+    // console.log('Outputs:')
+    // console.log(outputs)
     let totalTier = 0
     let count = 0
     const detectedFoods = []
@@ -281,19 +281,19 @@ const UserController = UserModel => {
       }
     })
 
-    console.log('Detected foods:')
-    console.log(detectedFoods)
+    // console.log('Detected foods:')
+    // console.log(detectedFoods)
 
     if (count > 0) {
       const tier = Math.min(Math.max(1, Math.round(totalTier / count)), 5)
-      const emissions = FOOD_TIERS[tier] * detectedFoods.length * 2
+      const emissions = FOOD_TIERS[tier] * detectedFoods.length
 
       for (footstep of priorData.footsteps) {
         if (footstep.date === date) {
           detectedFoods.forEach(foodName => {
             let newLog = {
               foodName,
-              servings: 2,
+              servings: 1,
               emissions: emissions / detectedFoods.length
             }
             footstep.foodLog.push(newLog)
