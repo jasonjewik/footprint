@@ -149,6 +149,7 @@ const UserController = UserModel => {
           servings,
           emissions
         }
+        footstep.stats.emissions += emissions
 
         footstep.foodLog.push(newLog)
         priorData.save()
