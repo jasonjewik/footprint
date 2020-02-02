@@ -10,6 +10,7 @@ const bodyParser = require('body-parser');
 const mongo = require('./db/mongo');
 const UserModel = require('./models/user');
 const {UserController} = require('./controllers/user');
+const {GoogleVisionAPI} = require('./services/googleapis');
 
 function main(port)
 {
@@ -23,7 +24,9 @@ function main(port)
 
 	const router = express.Router();
 	const userController = UserController(UserModel);
+	const googleVisionAPI = GoogleVisionAPI();
 	router.use('/users', userController);
+	router.use('/vision', googleVisionAPI);
 
 	app.use('/api', router);
 	app.listen(port, () => {
