@@ -69,14 +69,6 @@ const UserController = (UserModel) =>
                 error: 'Invalid User ID'
             });
 
-        // Check if footstep for date already exists
-        const date = new Date().toDateString();
-        const priorFootstep = await UserModel.findOne({"fb_id": fb_id, "footsteps.date": date});
-        if(priorFootstep != null)
-            return res.status(404).json({
-                error: 'Footstep for date already exists'
-            });
-
         // Create and insert new footstep
         const new_footstep = { date: date, 
                                foodLog: [], 
