@@ -11,7 +11,7 @@ const FOOD_TIERS = {
 const AVERAGE_FOOD_EMISSIONS = 750
 
 function foodEmissions(food, servings) {
-  const words = food.split(' ')
+  const words = food.toLowerCase().split(' ')
   let totalTier = 0
   let count = 0
   for (const word of words) {
