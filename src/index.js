@@ -17,12 +17,7 @@ function main(port)
 	app.disable('x-powered-by');
 	app.use(compression());
 	app.use(morgan('dev'));
-	app.use(
-		cors({
-			origin: [`http://localhost:${port}`],
-			credentials: true
-		})
-	)
+	app.use(cors());
 	app.use(cookieParser());
 	app.use(bodyParser.json());
 
