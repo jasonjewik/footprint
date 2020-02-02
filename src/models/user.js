@@ -11,8 +11,7 @@ const userSchema = new Schema({
             {
                 foodName: String,
                 servings: Number,
-                emissions: Number,
-                waterUsed: Number
+                emissions: Number
             }
         ],
         transportationLog: [
@@ -32,11 +31,9 @@ const userSchema = new Schema({
     }],
     lifetimeStats: {
         emissions: Number,
-        waterUsed: Number,
         distanceWalked: Number,
         distanceByCar: Number,
-        avgFoodEmissions: Number,
-        avgFoodWaterUse: Number
+        avgFoodEmissions: Number
     }
 });
 

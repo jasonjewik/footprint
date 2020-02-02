@@ -26,11 +26,9 @@ const UserController = (UserModel) =>
             dateJoined: new Date().toDateString(),
             lifetimeStats: {
                 emissions: 0,
-                waterUsed: 0,
                 distanceWalked: 0,
                 distanceByCar: 0,
-                avgFoodEmissions: 0,
-                avgFoodWaterUse: 0
+                avgFoodEmissions: 0
             }
         });
         
@@ -57,7 +55,6 @@ const UserController = (UserModel) =>
     });
 
     router.post('/footstep', async(req, res) => {
-
         // Validate request body
         const fb_id = req.body.fb_id;
         if (fb_id === undefined)
@@ -86,7 +83,6 @@ const UserController = (UserModel) =>
                                transportationLog: [], 
                                stats: {
                                    emissions: 0,
-                                   waterUsed: 0,
                                    distanceWalked: 0,
                                    distanceByCar: 0
                                } };
@@ -98,21 +94,18 @@ const UserController = (UserModel) =>
         );
 
         return res.status(200).json(data);
-
     });
 
     router.post('/food', async(req, res) => {
-
         // Validate request body
         const fb_id = req.body.fb_id;
         const date = req.body.date;
         const foodName = req.body.foodName;
         const servings = req.body.servings;
         const emissions = req.body.emissions;
-        const waterUsed = req.body.waterUsed;
 
         if (fb_id === undefined || date === undefined || foodName === undefined || 
-            servings === undefined || emissions === undefined || waterUsed === undefined)
+            servings === undefined || emissions === undefined)
             return res.status(400).json({
                 error: 'Malformed request'
             });
@@ -130,12 +123,14 @@ const UserController = (UserModel) =>
                 let newLog = {
                     foodName: foodName,
                     servings: servings,
-                    emissions: emissions,
-                    waterUsed: waterUsed
+                    emissions: emissions
                 };
 
                 footstep.foodLog.push(newLog);
                 priorData.save();
+
+                // Update footstep stats for the day
+                footstep.stats.emissions += emissions;
 
                 return res.status(200).json(priorData);
             }
@@ -144,11 +139,9 @@ const UserController = (UserModel) =>
         return res.status(404).json({
             error: 'No footstep for date found'
         });
-        
     });
 
     router.post('/transportation', async(req, res) => {
-
         // Validate request body
         const fb_id = req.body.fb_id;
         const date = req.body.date;
@@ -179,10 +172,17 @@ const UserController = (UserModel) =>
                     duration: duration,
                     emissions: emissions
                 };
-
                 footstep.transportationLog.push(newLog);
-                priorData.save();
 
+                // Update footstep stats for the day
+                footstepStats = footstep.stats;
+                footstepStats.emissions += emissions;
+                if(mode === "Walking")
+                    footstepStats.distanceWalked += distance
+                else if(mode === "Car")
+                    footstepStats.distanceByCar += distance
+
+                priorData.save();
                 return res.status(200).json(priorData);
             }
         }
@@ -190,7 +190,35 @@ const UserController = (UserModel) =>
         return res.status(404).json({
             error: 'No footstep for date'
         });
-        
+    });
+
+    router.get('/lifetime', async(req, res) => {
+        // Validate request body
+        const fb_id = req.body.fb_id;
+        if(fb_id === undefined)
+            return res.status(400).json({
+                error: 'Malformed request'
+            });
+
+        // Check if user exists
+        const priorData = await UserModel.findOne({fb_id: fb_id});
+        if (priorData == null) 
+            return res.status(404).json({
+                error: 'Invalid User ID'
+            });
+
+        // Update lifetime stats
+        priorData.lifetimeStats.emissions = 0;
+        priorData.lifetimeStats.distanceWalked = 0;
+        priorData.lifetimeStats.distanceByCar = 0;
+        for(footstep of priorData.footsteps) {
+            priorData.lifetimeStats.emissions += footstep.stats.emissions;
+            priorData.lifetimeStats.distanceWalked += footstep.stats.distanceWalked;
+            priorData.lifetimeStats.distanceByCar += footstep.stats.distanceByCar;
+        }
+
+        priorData.save();
+        return res.status(200).json(priorData.lifetimeStats);
     });
 
     return router;
