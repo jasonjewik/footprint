@@ -123,7 +123,8 @@ const UserController = (UserModel) =>
             if(footstep.date === date) {
                 let newLog = {
                     foodName: foodName,
-                    servings: servings
+                    servings: servings,
+                    emissions: 1
                 };
 
                 footstep.foodLog.push(newLog);
@@ -158,21 +159,30 @@ const UserController = (UserModel) =>
                 error: 'Invalid User ID'
             });
         
+        let emissions = distance;
+        if(mode === "Walking")
+            emissions *= 153;
+        else if(mode === "Car")
+            emissions *= 667;
+
         // Scan through footsteps and add new transportation log
         for(footstep of priorData.footsteps) {
             if(footstep.date === date) {
                 let newLog = {
                     mode: mode,
-                    distance: distance
+                    distance: distance,
+                    emissions: emissions
                 };
                 footstep.transportationLog.push(newLog);
 
                 // Update footstep stats for the day
                 footstepStats = footstep.stats;
                 if(mode === "Walking")
-                    footstepStats.distanceWalked += distance
+                    footstepStats.distanceWalked += distance;
                 else if(mode === "Car")
-                    footstepStats.distanceByCar += distance
+                    footstepStats.distanceByCar += distance;
+                
+                footstepStats.emissions += emissions;
 
                 priorData.save();
                 return res.status(200).json(priorData);
