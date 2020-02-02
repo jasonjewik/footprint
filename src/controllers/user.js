@@ -1,7 +1,6 @@
 require('dotenv').config()
 const express = require('express')
 const mongoose = require('mongoose')
-const utils = require('../services/utils')
 const vision = require('@google-cloud/vision')
 const {
   FOOD_TIERS,
