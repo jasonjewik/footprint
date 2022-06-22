@@ -19,7 +19,7 @@
   "homepage": "https://github.com/jasonjewik/footprint#readme",
   "dependencies": {
     "@google-cloud/vision": "^1.8.0",
-    "async": "^3.1.1",
+    "async": "^3.2.2",
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.4",
